@@ -21,29 +21,54 @@ function detectPlatform(url) {
     return null;
 }
 
+// Updated Codeforces problem parser
 function getCodeforcesStatement() {
     try {
-        
+        // Get problem title
         const titleElement = document.querySelector('.problem-statement .title');
         const title = titleElement ? titleElement.textContent.trim() : '';
 
-        const limits = document.querySelector('.problem-statement .time-limit');
-        const timeMemoryLimits = limits ? limits.parentElement.textContent.trim() : '';
+        // Get time and memory limits
+        const timeLimitElement = document.querySelector('.time-limit');
+        const memoryLimitElement = document.querySelector('.memory-limit');
+        const inputFileElement = document.querySelector('.input-file');
+        const outputFileElement = document.querySelector('.output-file');
 
+        let limits = '';
+        if (timeLimitElement) limits += timeLimitElement.textContent.trim() + '\n';
+        if (memoryLimitElement) limits += memoryLimitElement.textContent.trim() + '\n';
+        if (inputFileElement) limits += inputFileElement.textContent.trim() + '\n';
+        if (outputFileElement) limits += outputFileElement.textContent.trim() + '\n';
 
-        const problemStatementDiv = document.querySelector('.problem-statement');
-        const problemTextDiv = problemStatementDiv.querySelector('div:nth-child(2)');
-        const problemText = problemTextDiv ? problemTextDiv.textContent.trim() : '';
+        // Get problem statement text
+        // Get all div elements that are direct children of .problem-statement
+        const problemDivs = document.querySelectorAll('.problem-statement > div');
+        let problemText = '';
+        let foundStatement = false;
 
-    
+        // Skip the header div (index 0) and process until we hit input specification
+        for (let i = 1; i < problemDivs.length; i++) {
+            const div = problemDivs[i];
+            if (div.classList.contains('input-specification')) break;
+            
+            // Skip if it's a section title
+            if (!div.classList.contains('header') && !div.querySelector('.section-title')) {
+                problemText += div.textContent.trim() + '\n\n';
+                foundStatement = true;
+            }
+        }
+
+        // Get input specification
         const inputSpec = document.querySelector('.input-specification');
-        const inputSpecText = inputSpec ? inputSpec.textContent.trim() : '';
+        const inputSpecText = inputSpec ? 
+            'Input\n' + inputSpec.textContent.replace('Input', '').trim() : '';
 
-        
+        // Get output specification
         const outputSpec = document.querySelector('.output-specification');
-        const outputSpecText = outputSpec ? outputSpec.textContent.trim() : '';
+        const outputSpecText = outputSpec ? 
+            '\nOutput\n' + outputSpec.textContent.replace('Output', '').trim() : '';
 
-        
+        // Get sample tests with proper formatting
         let samplesText = '\nSample Test Cases:';
         const samples = document.querySelectorAll('.sample-test');
         samples.forEach((sample, index) => {
@@ -59,12 +84,12 @@ function getCodeforcesStatement() {
             }
         });
 
-        
+        // Get note if exists
         const note = document.querySelector('.note');
         const noteText = note ? '\n\nNote:\n' + note.textContent.trim() : '';
 
-   
-        return `${title}\n\n${timeMemoryLimits}\n\nProblem Statement:\n${problemText}\n\nInput Specification:\n${inputSpecText}\n\nOutput Specification:\n${outputSpecText}${samplesText}${noteText}`;
+        // Combine all parts
+        return `${title}\n\n${limits}\nProblem Statement:\n${problemText}${inputSpecText}${outputSpecText}${samplesText}${noteText}`;
     } catch (error) {
         console.error('Error parsing Codeforces problem:', error);
         return null;
