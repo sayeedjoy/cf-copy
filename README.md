@@ -32,6 +32,10 @@
 
 We aim to add support for more platforms in the future. If you have any requests, feel free to suggest them!
 
+## Disclaimer
+
+**Use this extension responsibly and ethically.** It is intended to assist you while practicing problems. If you're stuck on a problem or have spent over 30 minutes analyzing the problem statement or debugging your code, feel free to use it to gather your thoughts or seek help from GPT. **Avoid using this extension during real contests**, as doing so is unethical and goes against the principles of fair competition in competitive programming.
+
 ## Contributing
 
 If you're interested in contributing to CF Copy, feel free to fork this repository and submit a pull request. We're open to improvements and bug fixes from the community.
