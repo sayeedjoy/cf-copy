@@ -39,7 +39,3 @@ If you're interested in contributing to CF Copy, feel free to fork this reposito
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
-
----
-
-Feel free to customize this further based on specific technical details or instructions for use that you’d like to include.
