@@ -97,33 +97,133 @@ function getCodeforcesStatement() {
 }
 
 
+// Updated AtCoder problem parser
 function getAtCoderStatement() {
-    const title = getTextContent(document.querySelector('.h2'));
-    const problemText = getTextContent(document.querySelector('#task-statement span[class^="lang"] .part:nth-child(2)'));
-    
-    let limits = '';
-    const timeLimit = document.querySelector('.time-limit');
-    const memoryLimit = document.querySelector('.memory-limit');
-    if (timeLimit && memoryLimit) {
-        limits = `Time limit: ${timeLimit.textContent}\nMemory limit: ${memoryLimit.textContent}`;
-    }
+    try {
+        // Get title from English section
+        const titleElement = document.querySelector('.lang-en h3');
+        const title = titleElement ? titleElement.textContent.trim() : '';
 
-
-    const constraints = getTextContent(document.querySelector('#task-statement span[class^="lang"] .part:nth-child(3)'));
-    
-    let samplesText = '\nSample Test Cases:';
-    const samples = document.querySelectorAll('#task-statement .part pre');
-    for (let i = 0; i < samples.length; i += 2) {
-        const input = samples[i];
-        const output = samples[i + 1];
-        if (input && output) {
-            const sampleNum = Math.floor(i / 2) + 1;
-            samplesText += `\n\nInput ${sampleNum}:\n${formatPreContent(input)}`;
-            samplesText += `\n\nOutput ${sampleNum}:\n${formatPreContent(output)}`;
+        // Get time and memory limits
+        const timeLimit = document.querySelector('.time-limit');
+        const memoryLimit = document.querySelector('.memory-limit');
+        let limits = '';
+        if (timeLimit && memoryLimit) {
+            limits = `${timeLimit.textContent.trim()}\n${memoryLimit.textContent.trim()}`;
         }
-    }
 
-    return `${title}\n\n${limits}\n\nProblem Statement:\n${problemText}\n\nConstraints:\n${constraints}${samplesText}`;
+        // Get problem statement from English section
+        let problemText = '';
+        const statementParts = document.querySelectorAll('.lang-en div[class^="part"]');
+        
+        for (const part of statementParts) {
+            const header = part.querySelector('h3');
+            const content = part.querySelector('section');
+            
+            if (header) {
+                const headerText = header.textContent.trim();
+                if (headerText.toLowerCase().includes('problem statement')) {
+                    problemText = content ? content.textContent.trim() : '';
+                }
+            }
+        }
+
+        // Get constraints from English section
+        let constraints = '';
+        const constraintsPart = Array.from(statementParts).find(part => {
+            const header = part.querySelector('h3');
+            return header && header.textContent.trim().toLowerCase().includes('constraints');
+        });
+        if (constraintsPart) {
+            const content = constraintsPart.querySelector('section');
+            constraints = content ? content.textContent.trim() : '';
+        }
+
+        // Get input format from English section
+        let inputFormat = '';
+        const inputPart = Array.from(statementParts).find(part => {
+            const header = part.querySelector('h3');
+            return header && header.textContent.trim().toLowerCase().includes('input');
+        });
+        if (inputPart) {
+            const content = inputPart.querySelector('section');
+            inputFormat = content ? content.textContent.trim() : '';
+        }
+
+        // Get output format from English section
+        let outputFormat = '';
+        const outputPart = Array.from(statementParts).find(part => {
+            const header = part.querySelector('h3');
+            return header && header.textContent.trim().toLowerCase().includes('output');
+        });
+        if (outputPart) {
+            const content = outputPart.querySelector('section');
+            outputFormat = content ? content.textContent.trim() : '';
+        }
+
+        // Get sample cases - New improved version
+        let samplesText = '\nSample Test Cases:';
+        const sampleSections = document.querySelectorAll('.lang-en section');
+        let currentSample = [];
+        
+        sampleSections.forEach(section => {
+            // Look for h3 elements containing "Sample Input" or "Sample Output"
+            const sampleHeaders = section.querySelectorAll('h3');
+            let samplePres = section.querySelectorAll('pre');
+            
+            // If we found pre elements directly
+            if (samplePres.length > 0) {
+                samplePres.forEach(pre => {
+                    let prevHeader = pre.previousElementSibling;
+                    while (prevHeader && prevHeader.tagName !== 'H3') {
+                        prevHeader = prevHeader.previousElementSibling;
+                    }
+                    
+                    if (prevHeader) {
+                        const headerText = prevHeader.textContent.trim().toLowerCase();
+                        if (headerText.includes('sample input')) {
+                            const sampleNumber = headerText.match(/\d+/) || ['1'];
+                            samplesText += `\n\nSample Input ${sampleNumber[0]}:\n${formatPreContent(pre)}`;
+                        } else if (headerText.includes('sample output')) {
+                            const sampleNumber = headerText.match(/\d+/) || ['1'];
+                            samplesText += `\n\nSample Output ${sampleNumber[0]}:\n${formatPreContent(pre)}`;
+                        }
+                    }
+                });
+            }
+        });
+
+        // Format the final output
+        let output = title ? `${title}\n\n` : '';
+        output += limits ? `${limits}\n\n` : '';
+        output += problemText ? `Problem Statement:\n${problemText}\n\n` : '';
+        output += constraints ? `Constraints:\n${constraints}\n\n` : '';
+        output += inputFormat ? `Input:\n${inputFormat}\n\n` : '';
+        output += outputFormat ? `Output:\n${outputFormat}\n\n` : '';
+        output += samplesText;
+
+        // Clean up any excessive newlines
+        output = output.replace(/\n{3,}/g, '\n\n');
+        
+        return output;
+    } catch (error) {
+        console.error('Error parsing AtCoder problem:', error);
+        return null;
+    }
+}
+
+// Helper function to format pre content
+function formatPreContent(preElement) {
+    if (!preElement) return '';
+    
+    // Get the text content and split by newlines
+    let text = preElement.innerText || preElement.textContent;
+    
+    // Split by newlines, trim each line, and filter out empty lines
+    return text.split('\n')
+               .map(line => line.trim())
+               .filter(line => line.length > 0)
+               .join('\n');
 }
 
 function getCodeChefStatement() {
