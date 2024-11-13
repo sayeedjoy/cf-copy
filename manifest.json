@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "CF Copy",
+  "version": "1.0",
+  "description": "Copy problem statements from Codeforces, AtCoder, and CodeChef",
+  "permissions": [
+    "activeTab",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "*://*.codeforces.com/*",
+    "*://*.atcoder.jp/*",
+    "*://*.codechef.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "32": "icon32.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    },
+    "default_title": "Copy Problem Statement"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.codeforces.com/problemset/problem/*",
+        "*://*.codeforces.com/contest/*/problem/*",
+        "*://*.atcoder.jp/contests/*/tasks/*",
+        "*://*.codechef.com/problems/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
