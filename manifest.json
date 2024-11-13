@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CF Copy",
-  "version": "1.0",
+  "version": "2.0",
   "description": "Copy problem statements from Codeforces, AtCoder, and CodeChef",
   "permissions": [
     "activeTab",
